@@ -7,7 +7,7 @@ DIY Wispr Flow for Mac.
 - Single-tap Fn key  → stop recording, transcribe, paste at cursor
 
 Requirements (install once):
-    pip install faster-whisper sounddevice pyperclip pynput pyautogui
+    pip install faster-whisper sounddevice pyperclip pynput
 
 On first run you'll also need to grant Accessibility + Microphone permissions
 to your terminal app in System Settings > Privacy & Security.
@@ -22,8 +22,8 @@ import wave
 
 import sounddevice as sd
 import numpy as np
+import subprocess
 import pyperclip
-import pyautogui
 from pynput import keyboard
 
 # ─────────────────────────────────────────────
@@ -151,10 +151,12 @@ def _transcribe_and_paste():
 
 
 def _paste_text(text: str):
-    """Copy to clipboard then CMD+V into whatever is focused."""
     pyperclip.copy(text)
     time.sleep(PASTE_DELAY)
-    pyautogui.hotkey("command", "v")
+    subprocess.run([
+        "osascript", "-e",
+        'tell application "System Events" to keystroke "v" using command down'
+    ])
 
 
 # ─────────────────────────────────────────────
