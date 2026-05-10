@@ -80,7 +80,24 @@ class StatusOverlay:
             fill='#888888',
             outline='',
         )
+        self.root.after(100, self._set_native_window_level)
         self._follow_cursor()
+
+    def _set_native_window_level(self):
+        try:
+            import objc
+            from AppKit import NSFloatingWindowLevel
+            from AppKit import NSWindowCollectionBehaviorCanJoinAllSpaces, NSWindowCollectionBehaviorStationary
+            self.root.update()
+            view = objc.objc_object(c_void_p=self.root.winfo_id())
+            ns_win = view.window()
+            ns_win.setLevel_(NSFloatingWindowLevel)
+            ns_win.setCollectionBehavior_(
+                NSWindowCollectionBehaviorCanJoinAllSpaces |
+                NSWindowCollectionBehaviorStationary
+            )
+        except Exception as e:
+            print(f"[whispr] Window level warning: {e}")
 
     def _follow_cursor(self):
         x = self.root.winfo_pointerx() + 16
